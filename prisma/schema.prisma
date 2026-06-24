@@ -5,8 +5,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Usando SQLite para desenvolvimento local (será trocado para postgresql no deploy)
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // NextAuth schema requirements
