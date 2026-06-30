@@ -3,8 +3,8 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-// Lista de e-mails permitidos separada por vírgula no arquivo .env
-const allowedEmails = process.env.ALLOWED_EMAILS?.split(',') || [];
+// Lista de e-mails permitidos separada por vírgula no arquivo .env, removendo espaços extras
+const allowedEmails = process.env.ALLOWED_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -16,13 +16,22 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user }) {
-      // Se a variável ALLOWED_EMAILS estiver vazia, por segurança bloqueia todo mundo
-      if (allowedEmails.length === 0) return false;
+      const userEmail = user.email?.toLowerCase();
       
-      // Permitir apenas se o e-mail do usuário estiver na lista
-      if (user.email && allowedEmails.includes(user.email)) {
+      console.log("Tentativa de login. E-mail recebido:", userEmail);
+      console.log("Lista de e-mails permitidos na Vercel:", allowedEmails);
+      
+      if (allowedEmails.length === 0) {
+        console.error("ERRO: A variável ALLOWED_EMAILS está vazia na Vercel.");
+        return false;
+      }
+      
+      if (userEmail && allowedEmails.includes(userEmail)) {
+        console.log("Login autorizado para:", userEmail);
         return true;
       }
+      
+      console.error("ERRO: E-mail não autorizado:", userEmail);
       return false; // Bloqueia outros e-mails
     },
     async session({ session, user }) {
