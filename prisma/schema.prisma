@@ -59,15 +59,17 @@ model VerificationToken {
 
 // App-specific models
 model Task {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  category    String   // 'PROFESSIONAL', 'ACADEMIC', 'PERSONAL'
-  isCompleted Boolean  @default(false)
-  dueDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      String
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  category        String   // 'PROFESSIONAL', 'ACADEMIC', 'PERSONAL'
+  isCompleted     Boolean  @default(false)
+  dueDate         DateTime?
+  reminderMinutes Int?     // Minutos antes do prazo para disparar o lembrete
+  reminderSent    Boolean  @default(false) // Indica se o e-mail de lembrete já foi enviado
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String
   
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

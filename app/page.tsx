@@ -5,6 +5,7 @@ import { getTasks } from "./actions/tasks"
 import TaskForm from "./components/TaskForm"
 import TaskList from "./components/TaskList"
 import LogoutButton from "./components/LogoutButton"
+import TestEmailButton from "./components/TestEmailButton"
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
@@ -28,6 +29,7 @@ export default async function Home() {
         <div style={{ fontWeight: '600', fontSize: '1.25rem' }}>Agenda Pessoal</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <span className="text-muted" style={{ fontSize: '0.875rem' }}>Olá, {session.user?.name}</span>
+          <TestEmailButton />
           <LogoutButton />
         </div>
       </header>

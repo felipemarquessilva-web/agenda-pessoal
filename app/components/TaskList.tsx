@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TaskItem from './TaskItem'
 
 export default function TaskList({ tasks }: { tasks: any[] }) {
@@ -10,6 +10,11 @@ export default function TaskList({ tasks }: { tasks: any[] }) {
   // Inicia mostrando as tarefas de Hoje
   const [filter, setFilter] = useState<'ALL' | 'TODAY' | 'WEEK' | 'MONTH' | 'SPECIFIC'>('TODAY')
   const [specificDate, setSpecificDate] = useState<string>(todayStr)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   const filteredTasks = tasks.filter(task => {
     if (filter === 'ALL') return true;
@@ -131,7 +136,11 @@ export default function TaskList({ tasks }: { tasks: any[] }) {
         <span className="text-muted" style={{ fontSize: '0.875rem' }}>{filteredTasks.length} total</span>
       </div>
       
-      {filteredTasks.length === 0 ? (
+      {!mounted ? (
+        <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+          <p className="text-muted">Carregando tarefas...</p>
+        </div>
+      ) : filteredTasks.length === 0 ? (
         <div style={{ 
           textAlign: 'center', 
           padding: '4rem 2rem', 

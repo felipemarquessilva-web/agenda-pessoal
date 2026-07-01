@@ -2,6 +2,8 @@
 
 import { toggleTask, deleteTask } from '../actions/tasks'
 import { useTransition } from 'react'
+import { useState, useEffect } from 'react'
+import EditTaskModal from './EditTaskModal'
 
 type TaskProps = {
   task: {
@@ -9,7 +11,8 @@ type TaskProps = {
     title: string;
     category: string;
     isCompleted: boolean;
-    dueDate?: Date | null;
+    dueDate?: Date | string | null;
+    reminderMinutes?: number | null;
   }
 }
 
@@ -25,8 +28,16 @@ const catLabels: Record<string, string> = {
   PERSONAL: 'Pessoal'
 }
 
+import { useState, useEffect } from 'react'
+
 export default function TaskItem({ task }: TaskProps) {
   const [isPending, startTransition] = useTransition()
+  const [mounted, setMounted] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <div 
@@ -79,43 +90,90 @@ export default function TaskItem({ task }: TaskProps) {
                 alignItems: 'center',
                 gap: '0.25rem'
               }}>
-                🕒 {new Date(task.dueDate).toLocaleString('pt-BR', { 
+                🕒 {mounted ? new Date(task.dueDate).toLocaleString('pt-BR', { 
                   day: '2-digit', month: '2-digit', year: 'numeric', 
                   hour: '2-digit', minute: '2-digit' 
-                })}
+                }) : ''}
               </span>
             )}
           </div>
         </div>
       </div>
       
-      <button
-        onClick={() => {
-          if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-            startTransition(() => deleteTask(task.id))
-          }
-        }}
-        style={{
-          color: 'var(--accent-danger)',
-          padding: '0.5rem',
-          borderRadius: 'var(--border-radius-sm)',
-          opacity: 0.7,
-          marginLeft: '1rem'
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.opacity = '1'
-          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.opacity = '0.7'
-          e.currentTarget.style.backgroundColor = 'transparent'
-        }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="3 6 5 6 21 6"></polyline>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-        </svg>
-      </button>
+      <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center', marginLeft: '1rem' }}>
+        <button
+          onClick={() => setIsEditing(true)}
+          style={{
+            color: 'var(--accent-primary)',
+            padding: '0.5rem',
+            borderRadius: 'var(--border-radius-sm)',
+            opacity: 0.7,
+            cursor: 'pointer',
+            transition: 'var(--transition-fast)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+            border: 'none'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.opacity = '1'
+            e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.1)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.opacity = '0.7'
+            e.currentTarget.style.backgroundColor = 'transparent'
+          }}
+          title="Editar Tarefa"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path>
+          </svg>
+        </button>
+
+        <button
+          onClick={() => {
+            if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+              startTransition(() => deleteTask(task.id))
+            }
+          }}
+          style={{
+            color: 'var(--accent-danger)',
+            padding: '0.5rem',
+            borderRadius: 'var(--border-radius-sm)',
+            opacity: 0.7,
+            cursor: 'pointer',
+            transition: 'var(--transition-fast)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+            border: 'none'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.opacity = '1'
+            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.opacity = '0.7'
+            e.currentTarget.style.backgroundColor = 'transparent'
+          }}
+          title="Excluir Tarefa"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+
+      {isEditing && (
+        <EditTaskModal 
+          task={task} 
+          onClose={() => setIsEditing(false)} 
+        />
+      )}
     </div>
   )
 }

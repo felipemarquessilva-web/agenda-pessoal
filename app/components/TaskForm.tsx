@@ -10,6 +10,13 @@ export default function TaskForm() {
     <form 
       ref={formRef}
       action={async (formData) => {
+        const dueDate = formData.get('dueDate') as string
+        if (dueDate) {
+          // Converte a data local do navegador para uma string ISO (UTC)
+          // Isso garante que o servidor salve o momento exato
+          const localDate = new Date(dueDate)
+          formData.set('dueDate', localDate.toISOString())
+        }
         await createTask(formData)
         formRef.current?.reset()
       }}
@@ -74,6 +81,25 @@ export default function TaskForm() {
         <option value="PROFESSIONAL">Profissional</option>
         <option value="ACADEMIC">Acadêmica</option>
         <option value="PERSONAL">Pessoal</option>
+      </select>
+      <select 
+        name="reminderMinutes"
+        title="Definir Lembrete por E-mail"
+        style={{
+          padding: '0.75rem 1rem',
+          backgroundColor: 'var(--bg-tertiary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--border-radius-sm)',
+          color: 'var(--text-primary)',
+          fontSize: '1rem',
+          outline: 'none',
+          cursor: 'pointer'
+        }}
+      >
+        <option value="NONE">Sem lembrete</option>
+        <option value="15">15 minutos antes</option>
+        <option value="60">1 hora antes</option>
+        <option value="1440">1 dia antes</option>
       </select>
       <button 
         type="submit"
