@@ -28,7 +28,6 @@ const catLabels: Record<string, string> = {
   PERSONAL: 'Pessoal'
 }
 
-import { useState, useEffect } from 'react'
 
 export default function TaskItem({ task }: TaskProps) {
   const [isPending, startTransition] = useTransition()
